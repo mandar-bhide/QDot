@@ -1,0 +1,26 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "mime",
+      "rootUri": "file:///C:/Users/Manda/AppData/Roaming/Pub/Cache/hosted/pub.dartlang.org/mime-1.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "path",
+      "rootUri": "file:///C:/Users/Manda/AppData/Roaming/Pub/Cache/hosted/pub.dartlang.org/path-1.8.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "dart_server",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    }
+  ],
+  "generated": "2022-07-15T07:05:25.877271Z",
+  "generator": "pub",
+  "generatorVersion": "2.17.6"
+}

@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:liquid_engine/liquid_engine.dart';
 
 class ServerUtils{
-  static Future<String> renderTemplate(String filename) async {
-    File file = File.fromUri(Uri.file('templates/$filename'));
-    return await file.readAsString();
+  static Future<String> renderTemplate(String filename,[Map<String,dynamic>? data]) async {
+    final context = Context.create();
+    context.variables = data!;
+    final template = Template.parse(context,Source.fromString(await File('templates/'+filename).readAsString()));
+    return await template.render(context);
   }
 
   static debugPrint(String string){
@@ -31,4 +34,29 @@ class ServerUtils{
     final queryParams = Uri(query:await utf8.decoder.bind(request).join()).queryParameters;
     return queryParams;
   }
+
+  static redirect(HttpRequest request, String url) {
+    final htmlText = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n
+        <title>Redirecting...</title>\n
+        <h1>Redirecting...</h1>\n
+        <p>You should be redirected automatically to target URL: <a href="{html.escape(location)}">{display_location}</a>. 
+        If not click the link.''';
+    request.response
+      ..headers.set('Location', url)
+      ..headers.contentType = ContentType.html
+      ..write(htmlText)
+      ..close();
+  }
+
+  static String htmlEscape(String s) {
+    s.replaceAll('&',"&amp;");
+    s.replaceAll('<',"&lt;");
+    s.replaceAll('>',"&gt;");
+    return s;
+  }
+
 }
+
+/*
+
+ */

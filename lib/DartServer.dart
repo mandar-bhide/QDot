@@ -1,10 +1,8 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:mime/mime.dart';
-
 import 'ServerRoute.dart';
 import 'package:path/path.dart' as p;
-
 import 'ServerUtils.dart';
 
 class DartServer{
@@ -46,6 +44,15 @@ class DartServer{
       ..close();
   }
 
+  _page_404(HttpRequest request) async {
+    File file = File.fromUri(Uri.file('dart_server/static/404.html'));
+    final data = await file.readAsString();
+    request.response
+      ..headers.contentType = ContentType.html
+      ..write(data)
+      ..close();
+  }
+
   run() async {
     ProcessSignal.sigint.watch().listen((event) {
       if(event==ProcessSignal.sigint) exit(0);
@@ -56,7 +63,11 @@ class DartServer{
     try{
       if(this._server!=null){
         await for (HttpRequest request in this._server!) {
-          await _handleRequest(request);
+          try{
+            await _handleRequest(request);
+          }catch(e){
+            continue;
+          }
         }
       }
     }catch(e){
@@ -82,6 +93,7 @@ class DartServer{
           ..statusCode = 500
           ..close();
         statusCode = 500;
+        throw Exception;
       }
       print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");
       return;
@@ -89,10 +101,7 @@ class DartServer{
     if(routes.keys.contains(endpoint)){
       statusCode = await routes[endpoint]!.call(request);
     }else{                                    
-      request.response
-        ..statusCode = HttpStatus.notFound
-        ..write("${endpoint} not found on server")
-        ..close();
+      _page_404(request);
       statusCode = 404;
     }
     print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");

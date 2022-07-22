@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:liquid_engine/liquid_engine.dart';
 
 class ServerUtils{
+
   static Future<String> renderTemplate(String filename,[Map<String,dynamic>? data]) async {
     final context = Context.create();
     context.variables = data!;
@@ -35,17 +36,25 @@ class ServerUtils{
     return queryParams;
   }
 
-  static redirect(HttpRequest request, String url) {
-    final htmlText = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n
+  static redirect(HttpRequest request, String path) async {
+    
+    Uri uri;
+    if(_isPathOnServer(path)){
+      uri = Uri(
+        host:request.requestedUri.host,
+        port:request.requestedUri.port,
+        path:path
+      );
+    }else{
+      uri = Uri.dataFromString(path);
+    }
+    /*
+    final htmlText = '''<!DOCTYPE HTML>\n
         <title>Redirecting...</title>\n
         <h1>Redirecting...</h1>\n
-        <p>You should be redirected automatically to target URL: <a href="{html.escape(location)}">{display_location}</a>. 
-        If not click the link.''';
-    request.response
-      ..headers.set('Location', url)
-      ..headers.contentType = ContentType.html
-      ..write(htmlText)
-      ..close();
+        <p>You should be redirected automatically to target URL: <a href="${()=>htmlEscape(uri.toString())}">${uri.toString()}</a>. 
+        If not click the link.''';*/
+    await request.response.redirect(uri,status:301);
   }
 
   static String htmlEscape(String s) {
@@ -54,6 +63,8 @@ class ServerUtils{
     s.replaceAll('>',"&gt;");
     return s;
   }
+
+  static _isPathOnServer(String path) => path.startsWith('/');
 
 }
 

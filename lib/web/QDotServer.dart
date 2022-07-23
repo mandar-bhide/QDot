@@ -5,7 +5,7 @@ import 'ServerRoute.dart';
 import 'package:path/path.dart' as p;
 import 'ServerUtils.dart';
 
-class DartServer{
+class QDotServer{
   InternetAddress _host = InternetAddress.anyIPv4;
   int _port = 6969;
   HttpServer? _server;

@@ -1,9 +1,9 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:mime/mime.dart';
+import '../ServerUtils.dart';
 import 'ServerRoute.dart';
 import 'package:path/path.dart' as p;
-import 'ServerUtils.dart';
 
 class QDotServer{
   InternetAddress _host = InternetAddress.anyIPv4;
@@ -12,14 +12,14 @@ class QDotServer{
   List<String> filetypes = [];
   HashMap<String,ServerRoute> routes = HashMap();
 
-  DartServer(){
+  QDotServer({host,port}){
     routes['/'] = ServerRoute(handler:index,methods:['GET']);
+    if(host!=null) _host = host;
+    if(port!=null) _port=port;
   }
 
-  Future<HttpServer?> bindServer({InternetAddress? host,int? port}) async {
-    if(this._server==null){
-      this._host = host==null ? this._host : host;
-      this._port = port==null ? this._port : port;
+  Future<HttpServer?> _bindServer() async {
+    if(this._server==null){      
       this._server = await HttpServer.bind(_host, _port,shared:true);
     }
     else
@@ -54,6 +54,7 @@ class QDotServer{
   }
 
   run() async {
+    await _bindServer();
     ProcessSignal.sigint.watch().listen((event) {
       if(event==ProcessSignal.sigint) exit(0);
     });

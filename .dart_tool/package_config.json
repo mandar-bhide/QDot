@@ -27,7 +27,7 @@
     },
     {
       "name": "source_span",
-      "rootUri": "file:///C:/Users/Manda/AppData/Roaming/Pub/Cache/hosted/pub.dartlang.org/source_span-1.9.0",
+      "rootUri": "file:///C:/Users/Manda/AppData/Roaming/Pub/Cache/hosted/pub.dartlang.org/source_span-1.9.1",
       "packageUri": "lib/",
       "languageVersion": "2.14"
     },
@@ -44,13 +44,13 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "dart_server",
+      "name": "qdot",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2022-07-19T05:52:57.162819Z",
+  "generated": "2022-07-24T07:42:49.121400Z",
   "generator": "pub",
   "generatorVersion": "2.17.6"
 }

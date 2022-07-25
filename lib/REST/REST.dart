@@ -4,11 +4,11 @@ import 'dart:io';
 import '../REST/Endpoint.dart';
 import '../ServerUtils.dart';
 
-class QDotREST{
+class RESTServer{
   String name = "QDotREST Server";
   Map<String,Endpoint> endpoints = Map<String,Endpoint>();
   InternetAddress _host = InternetAddress.anyIPv4;
-  int _port = 6969;
+  int _port = 8000;
   HttpServer? _server;
 
   QDotREST({host,port}){
@@ -20,13 +20,13 @@ class QDotREST{
     endpoints[url] = endpoint;
   }
 
-  _bindServer() async {
+  bindServer() async {
     if(_server==null)
       _server = await HttpServer.bind(_host, _port,shared:true);
   }
 
-  run() async {
-    await _bindServer();
+  Future<dynamic> run() async {
+    await bindServer();
     ProcessSignal.sigint.watch().listen((event) {
       if(event==ProcessSignal.sigint) exit(0);
     });
@@ -37,8 +37,12 @@ class QDotREST{
       if(this._server!=null){
         await for (HttpRequest request in this._server!) {
           try{
-            await endpoints[request.uri.path]!.handleRequest(request);
-            print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${request.uri.path} HTTP/${request.protocolVersion}' 200");
+            if(endpoints[request.uri.path]!=null){
+              handleRequest(request);
+              print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${request.uri.path} HTTP/${request.protocolVersion}' 200");
+            }else{
+              continue;
+            }
           }on HttpException catch(e){
             print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${request.uri.path} HTTP/${request.protocolVersion}' 500");
             await request.response
@@ -49,9 +53,14 @@ class QDotREST{
           }
         }
       }
-    }catch(e){
+    }catch(e,s){
       print(e);
+      print(s);
     }
+  }
+
+  handleRequest(HttpRequest request) async {
+    await endpoints[request.uri.path]!.handleRequest(request);
   }
   
 }

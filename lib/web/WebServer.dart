@@ -5,14 +5,14 @@ import '../ServerUtils.dart';
 import 'ServerRoute.dart';
 import 'package:path/path.dart' as p;
 
-class QDotServer{
+class WebServer{
   InternetAddress _host = InternetAddress.anyIPv4;
-  int _port = 6969;
+  int _port = 8001;
   HttpServer? _server;
   List<String> filetypes = [];
   HashMap<String,ServerRoute> routes = HashMap();
 
-  QDotServer({host,port}){
+  WebServer({host,port}){
     routes['/'] = ServerRoute(handler:index,methods:['GET']);
     if(host!=null) _host = host;
     if(port!=null) _port=port;
@@ -36,7 +36,7 @@ class QDotServer{
   addFileType(String type)=>this.filetypes.add(type);
 
   index(HttpRequest request) async {
-    File file = File.fromUri(Uri.file('dart_server/static/index.html'));
+    File file = File.fromUri(Uri.file('qdot/static/index.html'));
     final data = await file.readAsString();
     request.response
       ..headers.contentType = ContentType.html
@@ -44,16 +44,7 @@ class QDotServer{
       ..close();
   }
 
-  _page_404(HttpRequest request) async {
-    File file = File.fromUri(Uri.file('dart_server/static/404.html'));
-    final data = await file.readAsString();
-    request.response
-      ..headers.contentType = ContentType.html
-      ..write(data)
-      ..close();
-  }
-
-  run() async {
+  Future<dynamic> run() async {
     await _bindServer();
     ProcessSignal.sigint.watch().listen((event) {
       if(event==ProcessSignal.sigint) exit(0);
@@ -65,18 +56,19 @@ class QDotServer{
       if(this._server!=null){
         await for (HttpRequest request in this._server!) {
           try{
-            await _handleRequest(request);
+            await handleRequest(request);
           }catch(e){
             continue;
           }
         }
       }
-    }catch(e){
+    }catch(e,s){
       print(e);
+      print(s);
     }
   }  
 
-  _handleRequest(HttpRequest request) async {
+  handleRequest(HttpRequest request) async {
     final endpoint = Uri.parse(request.requestedUri.toString()).path;
     int statusCode;
     if(this.filetypes.contains(p.extension(endpoint).replaceFirst('.',''))){
@@ -89,7 +81,9 @@ class QDotServer{
           ..statusCode = 200;     
         file.openRead().pipe(request.response);           
         statusCode = 200;
-      }catch(e){
+      }catch(e,s){
+        print(e);
+        print(s);
         request.response
           ..statusCode = 500
           ..close();
@@ -101,8 +95,7 @@ class QDotServer{
     }
     if(routes.keys.contains(endpoint)){
       statusCode = await routes[endpoint]!.call(request);
-    }else{                                    
-      _page_404(request);
+    }else{
       statusCode = 404;
     }
     print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");

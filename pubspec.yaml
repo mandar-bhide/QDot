@@ -9,3 +9,4 @@ dependencies:
   liquid_engine: ^0.2.2
   mime: ^1.0.2
   path: ^1.8.2
+  args: ^2.3.1

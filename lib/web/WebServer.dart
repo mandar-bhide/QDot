@@ -13,7 +13,7 @@ class WebServer{
   HashMap<String,ServerRoute> routes = HashMap();
 
   WebServer({host,port}){
-    routes['/'] = ServerRoute(handler:index,methods:['GET']);
+    routes['/'] = ServerRoute(path:'/',handler:index,methods:['GET']);
     if(host!=null) _host = host;
     if(port!=null) _port=port;
   }
@@ -24,13 +24,12 @@ class WebServer{
     }
     else
       print("Server already running on ${_host}:${_port}");
-
     return this._server;
   }
 
-  addRoute({required String name,required ServerRoute route}){
-    assert (!this.routes.containsKey(name),"Route $name already exists");
-    routes[name] = route;
+  addRoute({required ServerRoute route}){
+    assert (!this.routes.containsKey(route.path),"Route $route.path already exists");
+    routes[route.path] = route;
   }
 
   addFileType(String type)=>this.filetypes.add(type);

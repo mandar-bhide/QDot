@@ -64,7 +64,3 @@ class QDot{
   bool _isRESTRequest(HttpRequest request) => 
     restServer!.endpoints.keys.any((element) => element.hasMatch(request.requestedUri.path));
 }
-
-runApp(QDot app){
-
-}

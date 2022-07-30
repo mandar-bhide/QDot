@@ -1,6 +1,36 @@
 import 'dart:io';
 import 'package:qdot/main.dart';
 
+/***********************************
+Main function
+***********************************/
+main(List<String> args) async {
+  await makeServer().run();
+}
+
+/***********************************
+Creating server instance
+***********************************/
+
+makeServer() => QDot(
+  webServer:WebServer(  
+    filetypes:['css'],
+    routes:[
+      IndexRoute(),
+      TestRoute()
+    ]
+  ),
+  restServer:QDotREST(
+    endpoints:[
+      CustomEndpoint()
+    ]
+  )
+);
+
+/***********************************
+Creating Web routes
+***********************************/
+
 class TestRoute extends QDotRoute{
   TestRoute() : super(path:"/test/<string:name>");
   @override
@@ -13,15 +43,17 @@ class TestRoute extends QDotRoute{
 
 class IndexRoute extends QDotRoute{
   IndexRoute() : super(path:"/");
-
   @override
   Future call(HttpRequest request,Map<String,dynamic> params) async {
     return await ServerUtils.renderTemplate('index.html',{"redirect":"/test/mandar","someFunction":"/someFunction"});
   }
 }
 
-class CustomEndpoint extends Endpoint{
 
+/***********************************
+Creating REST endpoints
+***********************************/
+class CustomEndpoint extends Endpoint{
   CustomEndpoint():super(urlpattern:'/endpoint/<string:uid>');
   
   @override
@@ -33,22 +65,4 @@ class CustomEndpoint extends Endpoint{
   post(HttpRequest request,Map<String,dynamic> pathParams){
     return Endpoint.sendObjectAsJson(request,{'uid':pathParams['uid']});
   }
-}
-
-main(List<String> args) async {
-  final server = QDot(
-    webServer:WebServer(
-      routes:[
-        IndexRoute(),
-        TestRoute()
-      ]
-    ),
-    restServer:QDotREST(
-      endpoints:[
-        CustomEndpoint()
-      ]
-    )
-  );
-
-  await server.run();
 }

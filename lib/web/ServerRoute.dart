@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:qdot/URIHandler.dart';
+import '../Utils/URIHandler.dart';
 
 class QDotRoute{
   String path = "/";

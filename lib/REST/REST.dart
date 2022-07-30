@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:qdot/URIHandler.dart';
-
+import '../Utils/URIHandler.dart';
 import '../REST/Endpoint.dart';
-import '../ServerUtils.dart';
+import '../Utils/ServerUtils.dart';
 
 class QDotREST{
   String name = "QDotREST Server";

@@ -1,8 +1,8 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:mime/mime.dart';
-import 'package:qdot/URIHandler.dart';
-import '../ServerUtils.dart';
+import '../Utils/URIHandler.dart';
+import '../Utils/ServerUtils.dart';
 import 'ServerRoute.dart';
 import 'package:path/path.dart' as p;
 

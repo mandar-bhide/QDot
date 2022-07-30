@@ -1,15 +1,13 @@
 import 'dart:io';
-
 import 'package:args/args.dart';
 import 'package:qdot/REST/REST.dart';
 import 'package:qdot/web/WebServer.dart';
 import 'package:path/path.dart' as p;
-
 export 'web/WebServer.dart';
 export 'REST/REST.dart';
 export './web/ServerRoute.dart';
 export './REST/Endpoint.dart';
-export 'ServerUtils.dart';
+export './Utils/ServerUtils.dart';
 
 class QDot{
   WebServer? webServer;

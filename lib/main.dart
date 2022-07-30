@@ -3,6 +3,7 @@ import 'package:args/args.dart';
 import 'package:qdot/REST/REST.dart';
 import 'package:qdot/web/WebServer.dart';
 import 'package:path/path.dart' as p;
+import 'Utils/ServerUtils.dart';
 export 'web/WebServer.dart';
 export 'REST/REST.dart';
 export './web/ServerRoute.dart';
@@ -15,8 +16,9 @@ class QDot{
   InternetAddress _host = InternetAddress.anyIPv4;
   int _port = 8000;
   HttpServer? _server;
+  List<String> allowedOrigins = [];
 
-  QDot({this.webServer,this.restServer,List<String> args = const []}){
+  QDot({this.webServer,this.restServer,List<String> args = const [],this.allowedOrigins= const []}){
     ArgParser parser = ArgParser();
     parser.addOption('port',abbr:'p',defaultsTo:'8000');
     parser.addOption('host',abbr:'h',defaultsTo:'127.0.0.1');
@@ -44,6 +46,7 @@ class QDot{
             ..statusCode = 410
             ..write("Invalid request. Please verify the URL.")
             ..close();
+          print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${request.requestedUri.path} HTTP/${request.protocolVersion}' 400 [BAD REQUEST]");
         }   
         continue;            
       }catch(e,s){

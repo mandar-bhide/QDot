@@ -28,7 +28,7 @@ class WebServer{
   List<String> filetypes = [];
   HashMap<RegExp,QDotRoute> routes = HashMap();
 
-  WebServer({host,port,List<QDotRoute>? routes}){
+  WebServer({host,port,List<QDotRoute>? routes,List<String> filetypes=const ['css','js','ico']}){
     this.routes[RegExp(r'^$')] = IndexRoute();
     if(host!=null) _host = host;
     if(port!=null) _port=port;
@@ -37,6 +37,7 @@ class WebServer{
         this.routes[URIHandler.generateRegex(r.path)] = r;
       }
     }
+    this.filetypes = filetypes;
   }
 
   Future<HttpServer?> _bindServer() async {
@@ -69,7 +70,7 @@ class WebServer{
 
   Future handleRequest(HttpRequest request) async {
     final endpoint = Uri.parse(request.requestedUri.toString()).path;
-    int statusCode;
+    String statusCode = '';
     if(this.filetypes.contains(p.extension(endpoint).replaceFirst('.',''))){
       try{
         final path = endpoint.replaceFirst('/', '${Directory.current.path.replaceAll('\\','/')}/');
@@ -79,15 +80,14 @@ class WebServer{
           ..headers.contentType = ContentType(mimeType[0],mimeType[1])
           ..statusCode = 200;     
         file.openRead().pipe(request.response);           
-        statusCode = 200;
+        statusCode = '200 [OK]';
       }catch(e,s){
         print(e);
         print(s);
         request.response
           ..statusCode = 500
           ..close();
-        statusCode = 500;
-        throw Exception;
+        statusCode = '500 [INTERNAL SERVER ERROR]';
       }
       print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");
       return;
@@ -100,7 +100,7 @@ class WebServer{
         ..statusCode = 200
         ..write(res)
         ..close();
-      statusCode = 200;
+      statusCode = '200 [OK]';
       print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");
       return;
     }
@@ -114,20 +114,20 @@ class WebServer{
           ..headers.contentType = ContentType.html
           ..write(res)
           ..close();  
-        statusCode = 200;
+        statusCode = '200 [OK]';
       }catch(e){
         request.response
           ..statusCode = 500
           ..write("Internal server error")
           ..close();
-        statusCode = 500;  
+        statusCode = '500 [INTERNAL SERVER ERROR]';  
       }
     }catch(e){
       request.response
-        ..statusCode = 410
+        ..statusCode = 400
         ..write("Malformed URL.")
         ..close();
-      statusCode = 410;
+      statusCode = '400 [BAD REQUEST]';
     }
     
     print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");

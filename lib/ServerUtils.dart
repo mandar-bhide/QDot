@@ -46,7 +46,7 @@ class ServerUtils{
         path:path
       );
     }else{
-      uri = Uri.dataFromString(path);
+      uri = Uri.parse(path);
     }
     /*
     final htmlText = '''<!DOCTYPE HTML>\n

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 class Endpoint{
   String name;
   late String urlpattern;
@@ -7,7 +8,7 @@ class Endpoint{
 
   Endpoint({this.name="UnnamedEndpoint",String? urlpattern}){
     assert(urlpattern!=null,"URL pattern must be defined for ${this.name}");
-    this.urlpattern = urlpattern!;   
+    this.urlpattern = urlpattern!;  
     _handlers = {
       'GET':get,
       'POST':post,
@@ -17,27 +18,27 @@ class Endpoint{
     };
   }
 
-  handleRequest(HttpRequest request) async {
-    await _handlers[request.method.toUpperCase()]!(request);
+  handleRequest(HttpRequest request,Map<String,dynamic> pathParams) async {
+    await _handlers[request.method.toUpperCase()]!(request,pathParams);
   }
 
-  Future get(HttpRequest request) async {
+  Future get(HttpRequest request,Map<String,dynamic> pathParams) async {
     throw HttpException('Method not allowed'); 
   }
 
-  Future post(HttpRequest request) async {
+  Future post(HttpRequest request,Map<String,dynamic> pathParams) async {
     throw HttpException('Method not allowed'); 
   }
 
-  Future delete(HttpRequest request) async {
+  Future delete(HttpRequest request,Map<String,dynamic> pathParams) async {
     throw HttpException('Method not allowed'); 
   }
 
-  Future put(HttpRequest request) async {
+  Future put(HttpRequest request,Map<String,dynamic> pathParams) async {
     throw HttpException('Method not allowed'); 
   }
 
-  Future patch(HttpRequest request) async {
+  Future patch(HttpRequest request,Map<String,dynamic> pathParams) async {
     throw HttpException('Method not allowed'); 
   }
 

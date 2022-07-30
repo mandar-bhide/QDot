@@ -1,21 +1,42 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:mime/mime.dart';
+import 'package:qdot/URIHandler.dart';
 import '../ServerUtils.dart';
 import 'ServerRoute.dart';
 import 'package:path/path.dart' as p;
 
+class IndexRoute extends QDotRoute{
+
+  IndexRoute(): super(path:"/");
+
+  @override
+  Future call(HttpRequest request,Map<String,dynamic> params) async {
+    File file = File.fromUri(Uri.file('qdot/static/index.html'));
+    final data = await file.readAsString();
+    request.response
+      ..headers.contentType = ContentType.html
+      ..write(data)
+      ..close();
+  }
+}
+
 class WebServer{
   InternetAddress _host = InternetAddress.anyIPv4;
-  int _port = 8001;
+  int _port = 8000;
   HttpServer? _server;
   List<String> filetypes = [];
-  HashMap<String,ServerRoute> routes = HashMap();
+  HashMap<RegExp,QDotRoute> routes = HashMap();
 
-  WebServer({host,port}){
-    routes['/'] = ServerRoute(path:'/',handler:index,methods:['GET']);
+  WebServer({host,port,List<QDotRoute>? routes}){
+    this.routes[RegExp(r'^$')] = IndexRoute();
     if(host!=null) _host = host;
     if(port!=null) _port=port;
+    if(routes!=null){
+      for(QDotRoute r in routes){
+        this.routes[URIHandler.generateRegex(r.path)] = r;
+      }
+    }
   }
 
   Future<HttpServer?> _bindServer() async {
@@ -27,47 +48,26 @@ class WebServer{
     return this._server;
   }
 
-  addRoute({required ServerRoute route}){
-    assert (!this.routes.containsKey(route.path),"Route $route.path already exists");
-    routes[route.path] = route;
-  }
-
   addFileType(String type)=>this.filetypes.add(type);
-
-  index(HttpRequest request) async {
-    File file = File.fromUri(Uri.file('qdot/static/index.html'));
-    final data = await file.readAsString();
-    request.response
-      ..headers.contentType = ContentType.html
-      ..write(data)
-      ..close();
-  }
 
   Future<dynamic> run() async {
     await _bindServer();
     ProcessSignal.sigint.watch().listen((event) {
       if(event==ProcessSignal.sigint) exit(0);
     });
-
     print("Running server on http://${_host.address}:$_port");
-
-    try{
-      if(this._server!=null){
-        await for (HttpRequest request in this._server!) {
-          try{
-            await handleRequest(request);
-          }catch(e){
-            continue;
-          }
+    if(this._server!=null){
+      await for (HttpRequest request in this._server!) {
+        try{
+          await handleRequest(request);
+        }catch(e){
+          continue;
         }
       }
-    }catch(e,s){
-      print(e);
-      print(s);
     }
   }  
 
-  handleRequest(HttpRequest request) async {
+  Future handleRequest(HttpRequest request) async {
     final endpoint = Uri.parse(request.requestedUri.toString()).path;
     int statusCode;
     if(this.filetypes.contains(p.extension(endpoint).replaceFirst('.',''))){
@@ -92,11 +92,45 @@ class WebServer{
       print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");
       return;
     }
-    if(routes.keys.contains(endpoint)){
-      statusCode = await routes[endpoint]!.call(request);
-    }else{
-      statusCode = 404;
+
+    if(endpoint==""||endpoint=="/"){
+      final res = await routes[RegExp(r'^/$')]!.call(request,URIHandler.parsePath(routes[RegExp(r'^/$')]!.path,endpoint));
+      request.response
+        ..headers.contentType = ContentType.html
+        ..statusCode = 200
+        ..write(res)
+        ..close();
+      statusCode = 200;
+      print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");
+      return;
     }
+
+    try{
+      final route = routes.keys.firstWhere((element) => element.hasMatch(endpoint));
+      try{
+        final res = await routes[route]!.call(request,URIHandler.parsePath(routes[route]!.path,endpoint));
+        request.response
+          ..statusCode = 200
+          ..headers.contentType = ContentType.html
+          ..write(res)
+          ..close();  
+        statusCode = 200;
+      }catch(e){
+        request.response
+          ..statusCode = 500
+          ..write("Internal server error")
+          ..close();
+        statusCode = 500;  
+      }
+    }catch(e){
+      request.response
+        ..statusCode = 410
+        ..write("Malformed URL.")
+        ..close();
+      statusCode = 410;
+    }
+    
     print("${_host.address} - - [${ServerUtils.printDateTime()}] '${request.method} ${endpoint} HTTP/${request.protocolVersion}' $statusCode");
   }
+  
 }

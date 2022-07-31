@@ -20,6 +20,11 @@
 
 3. Update project level `pubspec.yaml`:
 ```
+publish_to: none
+
+environment:
+  sdk: ^2.17.6
+  
 dependencies: 
   qdot:
     path: ./QDot

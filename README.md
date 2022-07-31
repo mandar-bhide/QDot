@@ -25,6 +25,8 @@ dependencies:
     path: ./QDot
 ``` 
 
-4. Put HTML templates in `{project-name}/templates/` and static files in `{project-name}/static/`
+4. Create HTML templates named `index.html` and `test.html`.
 
-5. Refer `example.dart` for usage
+5. Put HTML templates in `{project-name}/templates/` and static files in `{project-name}/static/`
+
+6. Refer `example.dart` for usage

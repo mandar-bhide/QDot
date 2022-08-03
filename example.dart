@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:qdot/Security/CORS.dart';
 import 'package:qdot/main.dart';
 
 /***********************************
@@ -13,6 +14,10 @@ Creating server instance
 ***********************************/
 
 makeServer() => QDot(
+  corsPolicy: CORSPolicy(
+    allowOrigins: ['domain.name.com'],
+    allowMethods: ['GET','POST']
+  ),
   webServer:WebServer(  
     filetypes:['css'],
     routes:[

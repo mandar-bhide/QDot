@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:qdot/REST/REST.dart';
+import 'package:qdot/Security/CORS.dart';
 import 'package:qdot/web/WebServer.dart';
 import 'package:path/path.dart' as p;
 import 'Utils/ServerUtils.dart';
@@ -16,15 +17,16 @@ class QDot{
   InternetAddress _host = InternetAddress.anyIPv4;
   int _port = 8000;
   HttpServer? _server;
-  List<String> allowedOrigins = [];
+  CORSPolicy? corsPolicy;
 
-  QDot({this.webServer,this.restServer,List<String> args = const [],this.allowedOrigins= const []}){
+  QDot({this.webServer,this.restServer,List<String> args = const [],CORSPolicy? corsPolicy}){
     ArgParser parser = ArgParser();
     parser.addOption('port',abbr:'p',defaultsTo:'8000');
     parser.addOption('host',abbr:'h',defaultsTo:'127.0.0.1');
     final clargs = parser.parse(args);
     _host = InternetAddress(clargs['host']);
     _port = int.parse(clargs['port']);
+    if(corsPolicy!=null) this.corsPolicy = corsPolicy;
   }
 
   run() async {
@@ -36,6 +38,7 @@ class QDot{
     print("Running server on http://${_host.address}:$_port");
 
     await for (HttpRequest request in this._server!) {
+      if(corsPolicy!=null) request = corsPolicy!.applyPolicy(request);
       try{
         if(_isWebRequest(request) && webServer!=null){
           await webServer!.handleRequest(request);

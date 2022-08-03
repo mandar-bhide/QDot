@@ -16,7 +16,7 @@ Creating server instance
 makeServer() => QDot(
   corsPolicy: CORSPolicy(
     allowOrigins: ['domain.name.com'],
-    allowMethods: ['GET','POST']
+    allowMethods: [Method.GET,Method.POST]
   ),
   webServer:WebServer(  
     filetypes:['css'],

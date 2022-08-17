@@ -1,6 +1,6 @@
 # QDot
 ## Server framework in Dart
-<img src="https://www.mediafire.com/view/idemmqpnt74jp3y/qdot.jpg/file" alt="Logo" style="width:450px;"/>
+<img src="static/qdot.jpg" alt="Logo" style="width:450px;"/>
 
 ## Provides:
 - Web endpoints

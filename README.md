@@ -19,15 +19,12 @@
 `git clone https://github.com/mdb2301/QDot.git`
 
 3. Update project level `pubspec.yaml`:
-```
-publish_to: none
-
+```yaml
 environment:
   sdk: ^2.17.6
   
 dependencies: 
-  qdot:
-    path: ./QDot
+  qdot: 0.0.1
 ``` 
 
 4. Create HTML templates named `index.html` and `test.html`.

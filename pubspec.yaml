@@ -1,9 +1,12 @@
 name: qdot
-description: Just a place to practice
+description: Write servers in Dart
 version: 0.0.1
+publisher: QDot web
+homepage: https://github.com/mdb2301/QDot
+author: mdb <https://mandarbhide.web.app>
 
 environment:
-  sdk: '2.17.6'
+  sdk: ^2.17.6
   
 dependencies: 
   liquid_engine: ^0.2.2

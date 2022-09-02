@@ -24,7 +24,7 @@ environment:
   sdk: ^2.17.6
   
 dependencies: 
-  qdot: 0.0.1
+  qdot: 0.0.3
 ``` 
 
 4. Create HTML templates named `index.html` and `test.html`.

@@ -24,8 +24,10 @@ class QDot{
     parser.addOption('port',abbr:'p',defaultsTo:'8000');
     parser.addOption('host',abbr:'h',defaultsTo:'127.0.0.1');
     final clargs = parser.parse(args);
-    _host = InternetAddress(clargs['host']);
-    _port = int.parse(clargs['port']);
+    if(clargs['host']!=null)
+      _host = InternetAddress(clargs['host']);
+    if(clargs['port']!=null)
+      _port = int.parse(clargs['port']);
     if(corsPolicy!=null) this.corsPolicy = corsPolicy;
   }
 

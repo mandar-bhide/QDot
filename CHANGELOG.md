@@ -6,3 +6,6 @@
 
 ## [0.0.3] Platform support update
 * Updated to support Windows, Linux and MacOS only
+
+## [0.0.4] Minor changes
+* Minor changes and bug fixes

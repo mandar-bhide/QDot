@@ -1,6 +1,6 @@
 name: qdot
 description: Write servers in Dart
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/mdb2301/QDot
 
 environment:
